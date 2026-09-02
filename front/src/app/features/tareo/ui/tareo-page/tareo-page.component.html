@@ -80,12 +80,91 @@
         }
       </div>
 
+      <!-- Resumen del avance -->
+      <div class="matrix-summary">
+        <div class="summary-chip">
+          <span class="summary-value">{{ resumen().total }}</span>
+          <span class="summary-label">Total</span>
+        </div>
+        <div class="summary-chip">
+          <span class="summary-value text-corredor-600">{{ resumen().planilla }}</span>
+          <span class="summary-label">Planilla</span>
+        </div>
+        <div class="summary-chip">
+          <span class="summary-value text-amber-600">{{ resumen().practicante }}</span>
+          <span class="summary-label">Practicante</span>
+        </div>
+        <div class="summary-chip">
+          <span class="summary-value text-emerald-600">{{ resumen().completados }}</span>
+          <span class="summary-label">Completados</span>
+        </div>
+        <div class="summary-chip">
+          <span class="summary-value text-rose-500">{{ resumen().pendientes }}</span>
+          <span class="summary-label">Pendientes</span>
+        </div>
+        <div class="summary-progress">
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-xs font-semibold text-slate-500">Avance del registro</span>
+            <span class="text-xs font-bold text-corredor-600">{{ resumen().porcentaje }}%</span>
+          </div>
+          <div class="summary-bar">
+            <div class="summary-bar-fill" [style.width.%]="resumen().porcentaje"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Registro masivo -->
+      @if (!matriz.bloqueada) {
+        <div class="matrix-massive">
+          <span class="field-label whitespace-nowrap">Registro masivo</span>
+          <p-select
+            [options]="categorias"
+            optionLabel="label"
+            optionValue="value"
+            [ngModel]="masivoCategoria()"
+            (ngModelChange)="masivoCategoria.set($event)"
+            placeholder="Categoría"
+            class="min-w-[130px]"
+          />
+          <p-select
+            [options]="turnos"
+            optionLabel="label"
+            optionValue="value"
+            [ngModel]="masivoTurno()"
+            (ngModelChange)="masivoTurno.set($event)"
+            placeholder="Turno"
+            class="min-w-[130px]"
+          />
+          <p-button
+            label="Aplicar a seleccionados"
+            icon="pi pi-bolt"
+            severity="secondary"
+            [outlined]="true"
+            (onClick)="aplicarMasivo()"
+          />
+          <span class="text-xs text-slate-400 font-medium">
+            {{ seleccion().size }} seleccionado{{ seleccion().size !== 1 ? 's' : '' }}
+          </span>
+        </div>
+      }
+
       <div class="matrix-scroll">
         <p-table [value]="matriz.filas" [scrollable]="true" scrollHeight="520px" styleClass="matrix-table">
           <ng-template #header>
             <tr>
+              @if (!matriz.bloqueada) {
+                <th pFrozenColumn class="matrix-check-col">
+                  <input
+                    type="checkbox"
+                    class="matrix-checkbox"
+                    [checked]="todosSeleccionados()"
+                    (change)="toggleTodos()"
+                  />
+                </th>
+              }
               <th pFrozenColumn class="matrix-frozen-col">Colaborador</th>
               <th pFrozenColumn class="matrix-frozen-col matrix-dni-col">DNI</th>
+              <th pFrozenColumn class="matrix-frozen-col matrix-tipo-col">Tipo</th>
               @for (dia of matriz.dias; track dia.id) {
                 <th class="matrix-day-col">
                   <span class="matrix-day-name">{{ dia.diaSemana }}</span>
@@ -96,8 +175,23 @@
           </ng-template>
           <ng-template #body let-fila>
             <tr>
+              @if (!matriz.bloqueada) {
+                <td pFrozenColumn class="matrix-check-col">
+                  <input
+                    type="checkbox"
+                    class="matrix-checkbox"
+                    [checked]="estaSeleccionado(fila.tareoColaboradorId)"
+                    (change)="toggleSeleccion(fila.tareoColaboradorId)"
+                  />
+                </td>
+              }
               <td pFrozenColumn class="matrix-frozen-col font-semibold text-sm">{{ fila.nombres }}</td>
               <td pFrozenColumn class="matrix-frozen-col matrix-dni-col text-slate-500 text-sm">{{ fila.dni }}</td>
+              <td pFrozenColumn class="matrix-frozen-col matrix-tipo-col">
+                <span class="tipo-badge" [class.tipo-badge--prac]="fila.tipo === 'PRAC'">
+                  {{ tipoLabel(fila.tipo) }}
+                </span>
+              </td>
               @for (asist of fila.asistencias; track asist.periodoDiaId) {
                 @let dia = matriz.dias.find((d) => d.id === asist.periodoDiaId);
                 <td class="matrix-cell">

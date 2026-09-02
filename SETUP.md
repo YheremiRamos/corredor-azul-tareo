@@ -98,11 +98,17 @@ corredor-azul-tareo/
 
 ## Producción (Supabase)
 
-Ver `back/.env.example` para variables JDBC, JWT y correo RRHH.
+1. Edita `back/.env` (ya creado con tu proyecto) y completa:
+   - `DATABASE_PASSWORD` — contraseña de Postgres en Supabase
+   - `SUPABASE_SECRET_KEY` — secret key completa
+2. Arranca:
 
 ```powershell
-mvn spring-boot:run -pl bootstrap -am -Dspring-boot.run.profiles=prod
+cd back
+mvn spring-boot:run -pl bootstrap "-Dspring-boot.run.profiles=prod"
 ```
+
+Ver `back/.env.example` para todas las variables.
 
 ---
 

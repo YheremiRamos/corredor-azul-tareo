@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   inject,
   linkedSignal,
   signal,
@@ -24,6 +25,7 @@ import {
   GuardarAsistenciaItem,
   MatrizAsistencia,
   MatrizFila,
+  TIPO_TRABAJADOR_LABEL,
 } from '../../domain/tareo.model';
 
 @Component({
@@ -105,9 +107,116 @@ export class TareoPageComponent {
     { label: 'Partido', value: 'PARTIDO' },
   ];
 
+  // --- Seleccion y registro masivo ---
+  protected readonly seleccion = signal<Set<number>>(new Set());
+  protected readonly masivoCategoria = signal<string | null>('A');
+  protected readonly masivoTurno = signal<string | null>('MANANA');
+
+  // --- Resumen del avance (Planilla / Practicante / completados) ---
+  protected readonly resumen = computed(() => {
+    const matriz = this.matrizResource.value();
+    if (!matriz) {
+      return { total: 0, planilla: 0, practicante: 0, completados: 0, pendientes: 0, porcentaje: 0 };
+    }
+    const total = matriz.filas.length;
+    const planilla = matriz.filas.filter((f) => f.tipo === 'PLA').length;
+    const practicante = matriz.filas.filter((f) => f.tipo === 'PRAC').length;
+    const completados = matriz.filas.filter(
+      (f) => f.asistencias.length > 0 && f.asistencias.every((a) => !!a.categoriaCodigo),
+    ).length;
+    const pendientes = total - completados;
+    const porcentaje = total === 0 ? 0 : Math.round((completados / total) * 100);
+    return { total, planilla, practicante, completados, pendientes, porcentaje };
+  });
+
+  protected tipoLabel(tipo: string | null): string {
+    if (!tipo) return '-';
+    return TIPO_TRABAJADOR_LABEL[tipo] ?? tipo;
+  }
+
   protected chipClass(codigo: string | null): string {
     if (!codigo) return 'bg-slate-50 text-slate-400 border border-dashed border-slate-300';
     return CATEGORIA_COLORS[codigo] ?? CATEGORIA_COLORS['default'];
+  }
+
+  protected estaSeleccionado(tareoColaboradorId: number): boolean {
+    return this.seleccion().has(tareoColaboradorId);
+  }
+
+  protected toggleSeleccion(tareoColaboradorId: number): void {
+    const next = new Set(this.seleccion());
+    if (next.has(tareoColaboradorId)) {
+      next.delete(tareoColaboradorId);
+    } else {
+      next.add(tareoColaboradorId);
+    }
+    this.seleccion.set(next);
+  }
+
+  protected todosSeleccionados(): boolean {
+    const filas = this.matrizResource.value()?.filas ?? [];
+    return filas.length > 0 && filas.every((f) => this.seleccion().has(f.tareoColaboradorId));
+  }
+
+  protected toggleTodos(): void {
+    const filas = this.matrizResource.value()?.filas ?? [];
+    if (this.todosSeleccionados()) {
+      this.seleccion.set(new Set());
+    } else {
+      this.seleccion.set(new Set(filas.map((f) => f.tareoColaboradorId)));
+    }
+  }
+
+  protected aplicarMasivo(): void {
+    const matriz = this.matrizResource.value();
+    const tareoId = this.tareoId();
+    if (!matriz || !tareoId || this.seleccion().size === 0) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Registro masivo',
+        detail: 'Seleccione al menos un colaborador.',
+      });
+      return;
+    }
+
+    const categoria = this.masivoCategoria();
+    const turno = this.masivoTurno();
+    const items: GuardarAsistenciaItem[] = [];
+    for (const fila of matriz.filas) {
+      if (!this.seleccion().has(fila.tareoColaboradorId)) continue;
+      for (const asist of fila.asistencias) {
+        items.push({
+          tareoColaboradorId: fila.tareoColaboradorId,
+          periodoDiaId: asist.periodoDiaId,
+          categoriaCodigo: categoria,
+          turnoId: turno,
+          bonificacionNocturna: asist.bonificacionNocturna,
+          heTotal: asist.heTotal,
+          he25: asist.he25,
+          he30: asist.he30,
+          observacion: asist.observacion,
+        });
+      }
+    }
+
+    this.tareoApi.guardarAsistencias(tareoId, this.quincena(), items).subscribe({
+      next: () => {
+        this.seleccion.set(new Set());
+        this.matrizResource.reload();
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Registro masivo aplicado',
+          detail: `${items.length} registros guardados.`,
+        });
+      },
+      error: (err) => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'No se pudo aplicar',
+          detail: err?.error?.message ?? 'Intente nuevamente.',
+        });
+      },
+    });
   }
 
   protected habilitarTareo(): void {

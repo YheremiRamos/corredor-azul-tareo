@@ -15,6 +15,121 @@
   border-bottom-color: rgb(51 65 85 / 0.6);
 }
 
+/* --- Resumen del avance --- */
+.matrix-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1rem 1.5rem;
+  background: rgb(248 250 252 / 0.7);
+  border-bottom: 1px solid rgb(226 232 240 / 0.8);
+}
+
+:host-context(.dark) .matrix-summary {
+  background: rgb(30 41 59 / 0.4);
+  border-bottom-color: rgb(51 65 85 / 0.6);
+}
+
+.summary-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 3.5rem;
+}
+
+.summary-value {
+  font-size: 1.25rem;
+  font-weight: 800;
+  line-height: 1;
+  color: #334155;
+}
+
+:host-context(.dark) .summary-value {
+  color: #e2e8f0;
+}
+
+.summary-label {
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #94a3b8;
+  margin-top: 0.25rem;
+}
+
+.summary-progress {
+  flex: 1;
+  min-width: 12rem;
+}
+
+.summary-bar {
+  height: 0.5rem;
+  border-radius: 9999px;
+  background: rgb(226 232 240 / 0.9);
+  overflow: hidden;
+}
+
+:host-context(.dark) .summary-bar {
+  background: rgb(51 65 85 / 0.8);
+}
+
+.summary-bar-fill {
+  height: 100%;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, #0066cc, #3b9aff);
+  transition: width 0.3s ease;
+}
+
+/* --- Registro masivo --- */
+.matrix-massive {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1.5rem;
+  border-bottom: 1px solid rgb(226 232 240 / 0.8);
+}
+
+:host-context(.dark) .matrix-massive {
+  border-bottom-color: rgb(51 65 85 / 0.6);
+}
+
+/* --- Checkbox / Tipo --- */
+.matrix-check-col {
+  width: 2.75rem;
+  min-width: 2.75rem;
+  text-align: center !important;
+  background: inherit !important;
+}
+
+.matrix-checkbox {
+  width: 1rem;
+  height: 1rem;
+  accent-color: #0066cc;
+  cursor: pointer;
+}
+
+.matrix-tipo-col {
+  min-width: 6.5rem;
+}
+
+.tipo-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  background: rgb(0 102 204 / 0.1);
+  color: #0066cc;
+}
+
+.tipo-badge--prac {
+  background: rgb(245 158 11 / 0.12);
+  color: #b45309;
+}
+
 .matrix-scroll {
   padding: 0 0.5rem 0.5rem;
 }

@@ -96,6 +96,7 @@ public class TareoController {
                         f.colaborador().codigoSnapshot(),
                         f.colaborador().dniSnapshot(),
                         f.colaborador().nombresSnapshot(),
+                        f.colaborador().tipoSnapshot(),
                         f.asistencias().stream().map(this::toAsistenciaDto).toList()
                 ))
                 .toList();

@@ -1,0 +1,27 @@
+spring:
+  config:
+    import: optional:file:.env[.properties]
+  datasource:
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USER:postgres}
+    password: ${DATABASE_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: false
+  flyway:
+    enabled: true
+
+logging:
+  level:
+    pe.ctarequipa.tareo: INFO
+    org.hibernate.SQL: WARN
+
+app:
+  supabase:
+    url: ${SUPABASE_URL:}
+    publishable-key: ${SUPABASE_PUBLISHABLE_KEY:}
+    secret-key: ${SUPABASE_SECRET_KEY:}
+    jwks-url: ${SUPABASE_JWKS_URL:}

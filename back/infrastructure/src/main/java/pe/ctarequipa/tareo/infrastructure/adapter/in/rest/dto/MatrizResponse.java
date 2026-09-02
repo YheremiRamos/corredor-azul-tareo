@@ -19,6 +19,7 @@ public record MatrizResponse(
             String codigo,
             String dni,
             String nombres,
+            String tipo,
             List<AsistenciaDto> asistencias
     ) {}
 

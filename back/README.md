@@ -44,22 +44,30 @@ mvn clean package -DskipTests
 
 ## Producción con Supabase / PostgreSQL
 
-1. Copia `.env.example` a variables de entorno o crea `application-prod.yml`.
-2. Configura:
+El backend Java usa **JDBC directo** a PostgreSQL (no requiere `@supabase/server`, eso es para Node.js).
+
+1. Copia `.env.example` → `.env` en la carpeta `back/`.
+2. Completa en Supabase → **Project Settings → Database**:
+   - `DATABASE_PASSWORD` (contraseña de `postgres`)
+   - `SUPABASE_SECRET_KEY` (API Keys → secret key)
+3. Arranca con perfil `prod` (lee `back/.env` automáticamente):
+
+```powershell
+cd back
+mvn spring-boot:run -pl bootstrap "-Dspring-boot.run.profiles=prod"
+```
+
+Variables principales:
 
 ```env
-DATABASE_URL=jdbc:postgresql://db.xxxxx.supabase.co:5432/postgres?currentSchema=app
+SUPABASE_URL=https://ohqpnafnrevoavoybhlr.supabase.co
+DATABASE_URL=jdbc:postgresql://db.ohqpnafnrevoavoybhlr.supabase.co:5432/postgres?currentSchema=app&sslmode=require
 DATABASE_USER=postgres
 DATABASE_PASSWORD=tu_password
 JWT_SECRET=secreto-de-al-menos-32-caracteres
-RRHH_EMAIL=rrhh@ctarequipa.pe
 ```
 
-3. Arranca con perfil prod:
-
-```powershell
-mvn spring-boot:run -pl bootstrap -am -Dspring-boot.run.profiles=prod
-```
+Flyway crea el esquema `app` y los datos seed en la primera ejecución.
 
 ## Módulos Maven
 

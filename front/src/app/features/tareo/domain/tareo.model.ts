@@ -31,8 +31,15 @@ export interface MatrizFila {
   codigo: string;
   dni: string;
   nombres: string;
+  tipo: string | null;
   asistencias: MatrizAsistencia[];
 }
+
+export const TIPO_TRABAJADOR_LABEL: Record<string, string> = {
+  PLA: 'Planilla',
+  PRAC: 'Practicante',
+  HONA: 'Honorarios',
+};
 
 export interface MatrizTareo {
   tareoId: number;
