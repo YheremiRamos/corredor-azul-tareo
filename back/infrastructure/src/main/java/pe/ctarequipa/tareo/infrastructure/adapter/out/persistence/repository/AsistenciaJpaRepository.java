@@ -6,6 +6,7 @@ import org.springframework.data.repository.query.Param;
 import pe.ctarequipa.tareo.infrastructure.adapter.out.persistence.entity.AsistenciaEntity;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface AsistenciaJpaRepository extends JpaRepository<AsistenciaEntity, Long> {
 
@@ -18,4 +19,6 @@ public interface AsistenciaJpaRepository extends JpaRepository<AsistenciaEntity,
     List<AsistenciaEntity> findByTareoIdAndQuincena(@Param("tareoId") Long tareoId, @Param("quincena") int quincena);
 
     List<AsistenciaEntity> findByTareoColaboradorIdIn(List<Long> tareoColaboradorIds);
+
+    Optional<AsistenciaEntity> findByTareoColaboradorIdAndPeriodoDiaId(Long tareoColaboradorId, Long periodoDiaId);
 }

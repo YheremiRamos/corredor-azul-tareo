@@ -76,7 +76,19 @@ public class TareoJpaAdapter implements TareoRepository {
     @Override
     public void saveAsistencias(List<Asistencia> asistencias) {
         for (Asistencia a : asistencias) {
-            AsistenciaEntity entity = mapper.toEntity(a);
+            // Upsert por (tareo_colaborador, periodo_dia) para no violar el UNIQUE al re-editar.
+            AsistenciaEntity entity = asistenciaJpaRepository
+                    .findByTareoColaboradorIdAndPeriodoDiaId(a.tareoColaboradorId(), a.periodoDiaId())
+                    .orElseGet(AsistenciaEntity::new);
+            entity.setTareoColaboradorId(a.tareoColaboradorId());
+            entity.setPeriodoDiaId(a.periodoDiaId());
+            entity.setCategoriaCodigo(a.categoriaCodigo());
+            entity.setTurnoId(a.turnoId());
+            entity.setBonificacionNocturna(a.bonificacionNocturna());
+            entity.setHeTotal(a.heTotal());
+            entity.setHe25(a.he25());
+            entity.setHe30(a.he30());
+            entity.setObservacion(a.observacion());
             asistenciaJpaRepository.save(entity);
         }
     }

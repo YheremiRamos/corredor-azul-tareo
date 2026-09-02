@@ -9,6 +9,7 @@ import pe.ctarequipa.tareo.domain.model.PeriodoDia;
 import pe.ctarequipa.tareo.domain.model.Tareo;
 import pe.ctarequipa.tareo.domain.model.TareoColaborador;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -36,12 +37,28 @@ public class ConsultarMatrizService implements ConsultarMatrizUseCase {
         List<TareoColaborador> colaboradores = tareoRepository.findColaboradoresByTareoId(tareoId);
         List<Asistencia> asistencias = tareoRepository.findAsistenciasByTareoIdAndQuincena(tareoId, quincena);
 
-        Map<Long, List<Asistencia>> porColaborador = asistencias.stream()
-                .collect(Collectors.groupingBy(Asistencia::tareoColaboradorId));
+        // Indexa asistencias existentes por (colaborador, dia) para armar la matriz completa.
+        Map<String, Asistencia> existentes = asistencias.stream()
+                .collect(Collectors.toMap(
+                        a -> a.tareoColaboradorId() + ":" + a.periodoDiaId(),
+                        a -> a,
+                        (a, b) -> a));
 
         List<MatrizTareo.FilaMatriz> filas = new ArrayList<>();
         for (TareoColaborador col : colaboradores) {
-            filas.add(new MatrizTareo.FilaMatriz(col, porColaborador.getOrDefault(col.id(), List.of())));
+            List<Asistencia> celdas = new ArrayList<>();
+            for (PeriodoDia dia : dias) {
+                Asistencia existente = existentes.get(col.id() + ":" + dia.id());
+                if (existente != null) {
+                    celdas.add(existente);
+                } else {
+                    // Celda vacia (aun sin registrar) para que sea visible y editable.
+                    celdas.add(new Asistencia(
+                            null, col.id(), dia.id(), null, null,
+                            false, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, null));
+                }
+            }
+            filas.add(new MatrizTareo.FilaMatriz(col, celdas));
         }
 
         return new MatrizTareo(tareoId, quincena, tareo.quincenaBloqueada(quincena), dias, filas);
