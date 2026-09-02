@@ -1,0 +1,86 @@
+.matrix-card {
+  overflow: hidden;
+}
+
+.matrix-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid rgb(226 232 240 / 0.8);
+}
+
+:host-context(.dark) .matrix-toolbar {
+  border-bottom-color: rgb(51 65 85 / 0.6);
+}
+
+.matrix-scroll {
+  padding: 0 0.5rem 0.5rem;
+}
+
+.matrix-frozen-col {
+  min-width: 11rem;
+  background: inherit !important;
+}
+
+.matrix-dni-col {
+  min-width: 6.5rem;
+}
+
+.matrix-day-col {
+  text-align: center !important;
+  min-width: 2.75rem !important;
+  padding: 0.5rem 0.25rem !important;
+}
+
+.matrix-day-name {
+  display: block;
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #94a3b8;
+}
+
+.matrix-day-num {
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: #334155;
+  margin-top: 2px;
+}
+
+:host-context(.dark) .matrix-day-num {
+  color: #cbd5e1;
+}
+
+.matrix-cell {
+  text-align: center !important;
+  padding: 0.25rem !important;
+}
+
+.attendance-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2rem;
+  height: 1.75rem;
+  padding: 0 0.375rem;
+  border-radius: 6px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.15s;
+
+  &:hover:not(:disabled) {
+    transform: scale(1.08);
+    box-shadow: 0 2px 8px rgb(0 0 0 / 0.12);
+  }
+
+  &:disabled {
+    cursor: default;
+    opacity: 0.85;
+  }
+}

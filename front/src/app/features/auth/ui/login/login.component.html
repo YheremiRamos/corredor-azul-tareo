@@ -1,0 +1,109 @@
+<div class="login-page">
+  <section class="login-brand">
+    <div class="brand-glow"></div>
+    <div class="brand-content">
+      <div class="brand-logo">
+        <div class="brand-logo-icon">
+          <i class="pi pi-directions"></i>
+        </div>
+        <div>
+          <p class="brand-eyebrow">Consorcio Transporte Arequipa</p>
+          <p class="brand-title">Corredor Azul</p>
+        </div>
+      </div>
+      <p class="brand-tagline">
+        Plataforma integral para el registro, seguimiento y consolidación del tareo de colaboradores.
+      </p>
+
+      <div class="brand-stats">
+        <div class="brand-stat">
+          <strong>22→21</strong>
+          <span>Ciclo mensual</span>
+        </div>
+        <div class="brand-stat">
+          <strong>2</strong>
+          <span>Quincenas</span>
+        </div>
+        <div class="brand-stat">
+          <strong>15</strong>
+          <span>Códigos</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="brand-features">
+      <div class="brand-feature">
+        <i class="pi pi-table"></i>
+        <span>Matriz de asistencia con registro por área</span>
+      </div>
+      <div class="brand-feature">
+        <i class="pi pi-shield"></i>
+        <span>Control de acceso por rol y área operativa</span>
+      </div>
+      <div class="brand-feature">
+        <i class="pi pi-file-export"></i>
+        <span>Exportación Excel, PDF y consolidación RRHH</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="login-form-panel">
+    <div class="login-card">
+      <div class="login-card-header">
+        <div class="mobile-brand">
+          <i class="pi pi-directions text-xl"></i>
+          Corredor Azul
+        </div>
+      </div>
+
+      <div class="login-card-inner">
+        <span class="brand-badge">Sistema de Tareo</span>
+        <h1 class="login-title">Iniciar sesión</h1>
+        <p class="login-subtitle">Ingrese sus credenciales corporativas</p>
+
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" class="login-card-body">
+          @if (errorMessage()) {
+            <p-message severity="error" [text]="errorMessage()!" />
+          }
+
+          <div class="flex flex-col gap-2">
+            <label for="email" class="field-label">Usuario o correo</label>
+            <input
+              pInputText
+              id="email"
+              type="text"
+              formControlName="email"
+              class="w-full"
+              autocomplete="username"
+              placeholder="usuario@cta.pe"
+            />
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <label for="password" class="field-label">Contraseña</label>
+            <p-password
+              inputId="password"
+              formControlName="password"
+              [feedback]="false"
+              [toggleMask]="true"
+              styleClass="w-full"
+              inputStyleClass="w-full"
+              autocomplete="current-password"
+              placeholder="••••••••"
+            />
+          </div>
+
+          <p-button
+            type="submit"
+            label="Ingresar"
+            icon="pi pi-arrow-right"
+            iconPos="right"
+            styleClass="w-full"
+            [loading]="loading()"
+            [disabled]="form.invalid"
+          />
+        </form>
+      </div>
+    </div>
+  </section>
+</div>

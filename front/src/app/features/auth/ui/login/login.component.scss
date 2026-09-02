@@ -1,0 +1,246 @@
+:host {
+  display: block;
+}
+
+.login-page {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr;
+
+  @media (min-width: 960px) {
+    grid-template-columns: 1.15fr 1fr;
+  }
+}
+
+.login-brand {
+  display: none;
+  position: relative;
+  overflow: hidden;
+  padding: 3.5rem;
+  color: white;
+
+  @media (min-width: 960px) {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+}
+
+.login-brand::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(155deg, #000d1a 0%, #001429 25%, #003d7a 55%, #0066cc 85%, #4a9ae8 100%);
+}
+
+.login-brand::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgb(255 255 255 / 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 0.03) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: linear-gradient(to bottom, black 30%, transparent 100%);
+}
+
+.brand-glow {
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgb(61 142 222 / 0.25) 0%, transparent 70%);
+  top: -200px;
+  right: -150px;
+  pointer-events: none;
+}
+
+.brand-content {
+  position: relative;
+  z-index: 1;
+}
+
+.brand-logo {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.brand-logo-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: rgb(255 255 255 / 0.12);
+  backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.625rem;
+  border: 1px solid rgb(255 255 255 / 0.18);
+  box-shadow: 0 8px 32px rgb(0 0 0 / 0.15);
+}
+
+.brand-eyebrow {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.65;
+  margin-bottom: 0.25rem;
+}
+
+.brand-title {
+  font-size: 2.25rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+.brand-tagline {
+  font-size: 1.0625rem;
+  font-weight: 500;
+  opacity: 0.88;
+  max-width: 360px;
+  line-height: 1.65;
+  margin-top: 1rem;
+}
+
+.brand-stats {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-top: 2.5rem;
+}
+
+.brand-stat {
+  padding: 1rem;
+  border-radius: 12px;
+  background: rgb(255 255 255 / 0.08);
+  border: 1px solid rgb(255 255 255 / 0.1);
+  backdrop-filter: blur(8px);
+
+  strong {
+    display: block;
+    font-size: 1.25rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+
+  span {
+    font-size: 0.75rem;
+    opacity: 0.75;
+    font-weight: 500;
+  }
+}
+
+.brand-features {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.brand-feature {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  opacity: 0.9;
+
+  i {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: rgb(255 255 255 / 0.1);
+    border: 1px solid rgb(255 255 255 / 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.875rem;
+    flex-shrink: 0;
+  }
+}
+
+.login-form-panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 400px;
+}
+
+.login-card-header {
+  margin-bottom: 2rem;
+}
+
+.mobile-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  margin-bottom: 1.75rem;
+  color: #002952;
+  font-weight: 800;
+  font-size: 1.125rem;
+
+  @media (min-width: 960px) {
+    display: none;
+  }
+}
+
+:host-context(.dark) .mobile-brand {
+  color: #75abe7;
+}
+
+.login-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.login-card-inner {
+  padding: 2rem;
+  border-radius: 1.25rem;
+  border: 1px solid rgb(226 232 240 / 0.9);
+  background: white;
+  box-shadow:
+    0 1px 2px rgb(0 41 82 / 0.04),
+    0 16px 48px -12px rgb(0 41 82 / 0.12);
+}
+
+:host-context(.dark) .login-card-inner {
+  background: rgb(15 23 42 / 0.9);
+  border-color: rgb(51 65 85 / 0.6);
+  backdrop-filter: blur(12px);
+}
+
+.login-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #002952;
+  margin: 0.75rem 0 0;
+}
+
+:host-context(.dark) .login-title {
+  color: #f1f5f9;
+}
+
+.login-subtitle {
+  font-size: 0.9375rem;
+  color: #64748b;
+  margin-top: 0.375rem;
+  font-weight: 500;
+}
+
+:host-context(.dark) .login-subtitle {
+  color: #94a3b8;
+}

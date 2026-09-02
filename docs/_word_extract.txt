@@ -1,0 +1,1056 @@
+Sistema Web de Gestión de Tareo y Asistencia
+1. Descripción general del proyecto
+Se desarrollará una plataforma web para la gestión, registro, seguimiento, validación y consolidación del tareo de los colaboradores de la empresa.
+La plataforma permitirá centralizar el proceso actualmente realizado mediante archivos y comunicaciones manuales, proporcionando una herramienta que permita a:
+RRHH administrar la información general del sistema.
+Los responsables de las áreas registrar el tareo de los colaboradores bajo su responsabilidad.
+Los delegados realizar el registro cuando hayan sido autorizados por el responsable o jefe correspondiente.
+RRHH realizar el seguimiento del avance de todas las áreas.
+Controlar los periodos y quincenas.
+Validar que los registros estén completos.
+Consolidar la información.
+Generar reportes.
+Mantener trazabilidad de los cambios realizados.
+La solución será desarrollada inicialmente utilizando:
+Backend: Java + Spring Boot.
+Base de datos: My SQL.
+Frontend: aplicación web.
+API: REST.
+Reportes: Excel, PDF y TXT.
+Notificaciones: correo electrónico.
+2. Autenticación y acceso
+2.1. Autenticación futura mediante Microsoft
+La solución deberá contemplar que posteriormente los usuarios puedan autenticarse utilizando sus cuentas corporativas de Microsoft, mediante el mecanismo de autenticación correspondiente de Microsoft 365/Entra ID.
+Sin embargo, esta funcionalidad no formará parte de la primera versión del proyecto.
+Se dejará preparada la arquitectura para que posteriormente pueda reemplazarse el mecanismo de autenticación actual por autenticación corporativa.
+2.2. Autenticación inicial
+Durante la primera etapa se utilizarán credenciales predefinidas dentro de la plataforma.
+Cada usuario tendrá:
+Usuario.
+Contraseña.
+Nombre.
+Estado.
+Rol.
+Áreas asignadas.
+Por ejemplo:
+Usuario: shirley
+Contraseña: ********
+Rol: RRHH
+Áreas:
+✓ RRHH
+✓ RECAUDO
+Otro usuario podría tener:
+Usuario: responsable01
+Rol: RESPONSABLE
+Áreas:
+✓ OPERACIONES
+Las credenciales serán administradas desde el módulo correspondiente y no deberán otorgar acceso general a toda la información.
+3. Actores del sistema
+La plataforma contemplará inicialmente los siguientes perfiles.
+3.1. Administrador / RRHH
+Tendrá acceso general a la plataforma.
+Podrá:
+Administrar colaboradores.
+Administrar áreas.
+Administrar subáreas.
+Administrar tipos de trabajador.
+Administrar usuarios.
+Asignar responsables.
+Asignar áreas a responsables.
+Administrar periodos.
+Administrar quincenas.
+Registrar el tareo de las jefaturas.
+Consultar los tareos de todas las áreas.
+Consolidar información.
+Realizar modificaciones autorizadas.
+Consultar auditoría.
+Generar reportes.
+Realizar seguimiento de los responsables.
+3.2. Responsable de área
+El responsable podrá registrar el tareo únicamente de las áreas que tenga asignadas.
+Podrá:
+Visualizar sus áreas.
+Seleccionar un área.
+Visualizar los colaboradores activos correspondientes.
+Seleccionar el periodo habilitado.
+Registrar asistencias.
+Registrar turnos.
+Registrar incidencias.
+Registrar bonificación nocturna.
+Registrar horas extras.
+Registrar observaciones.
+Realizar registros masivos.
+Guardar avances.
+Editar el tareo mientras esté permitido.
+Enviar el tareo a RRHH.
+Notificar a RRHH que el tareo fue completado.
+3.3. Delegado
+El delegado tendrá permisos similares al responsable, pero solamente sobre las áreas que le hayan sido asignadas.
+Esto permitirá que un jefe de área pueda delegar el registro del tareo a otra persona sin tener que otorgarle acceso a todas la áreas a su cargo.
+4. Estructura organizacional
+La plataforma deberá utilizar como información maestra la estructura de áreas y subáreas definida por la empresa.
+Actualmente se consideran las siguientes áreas:
+Código
+Área
+SIS
+SISTEMAS
+DAT
+DATOS
+LEG
+LEGAL
+RRHH
+RRHH
+OPE
+OPERACIONES
+CONT
+CONTABILIDAD
+LIQ
+LIQUIDACIÓN
+SEG
+SEGURIDAD
+GADM
+GERENCIA ADMINISTRATIVA
+LIM
+LIMPIEZA
+ALM
+ALMACÉN
+COM
+COMUNICACIONES
+MAN
+MANTENIMIENTO
+GGEN
+GERENCIA GENERAL
+5. Subáreas
+Las subáreas deberán estar relacionadas con su respectiva área.
+Actualmente se contempla:
+OPERACIONES
+OPERACIONES
+│
+├── CENTRO_CONTROL
+├── CONDUCTORES_PATIO
+├── GERENCIA_OPERACIONES
+└── DESPACHO_E_INSPECTORIA
+└── GUADAVÍA
+└──CONDUCTORES
+LIQUIDACIÓN
+LIQUIDACIÓN
+│
+├── RECAUDO
+├── ZONA_PAGA_LEONCIO
+└── ZONA_PAGA_BOLIVIA
+El sistema deberá permitir que posteriormente se puedan agregar nuevas subáreas sin modificar la estructura del aplicativo.
+6. Tipos de trabajador
+El sistema deberá manejar inicialmente:
+Código
+Tipo
+PLA
+PLANILLA
+PRAC
+PRACTICANTE
+HONA
+HONORARIOS
+Para la primera versión del proceso de tareo se considerarán:
+✓ PLANILLA
+✓ PRACTICANTE
+El tipo HONORARIOS deberá mantenerse disponible para una futura implementación.
+7. Gestión de colaboradores
+RRHH deberá contar con un maestro de colaboradores.
+Cada colaborador deberá tener como mínimo:
+Código de colaborador
+Nombres(Apellidos y nombres)
+DNI (Documento de identidad (CE y DNI)
+Tipo de trabajador
+Área
+Subárea
+Cargo
+Fecha de ingreso
+Fecha de cese
+Estado
+El campo dni podrá representar:
+DNI.
+Carnet de extranjería.
+Otro documento autorizado.
+8. Regla de colaboradores activos
+El sistema deberá considerar únicamente los colaboradores activos que correspondan al periodo que se está registrando.
+Por ejemplo:
+Área: OPERACIONES
+Periodo: SEPTIEMBRE 2026
+Colaboradores activos:
+✓ Juan Pérez
+✓ Carlos López
+✓ Pedro Sánchez
+Un colaborador inactivo no deberá aparecer automáticamente en el tareo.
+Sin embargo, para garantizar la integridad histórica, el sistema deberá conservar los colaboradores considerados para un tareo una vez que el periodo haya sido abierto/iniciado.
+De esta manera, si posteriormente se modifica el estado de un colaborador, no se deberá alterar un tareo histórico ya iniciado.
+9. Gestión de periodos
+Esta es una de las reglas principales del sistema.
+El sistema NO deberá interpretar un periodo como un simple mes calendario.
+Por ejemplo:
+El periodo septiembre no corresponde al 01/09/2026 – 30/09/2026.
+Corresponde a:
+22/08/2026 ───────────────── 21/09/2026
+SEPTIEMBRE
+Por tanto:
+Periodo septiembre 2026
+Inicio: 22/08/2026
+Fin:    21/09/2026
+Periodo octubre 2026
+Inicio: 22/09/2026
+Fin:    21/10/2026
+Periodo noviembre 2026
+Inicio: 22/10/2026
+Fin:    21/11/2026
+Periodo diciembre 2026
+Inicio: 22/11/2026
+Fin:    21/12/2026
+10. Administración de periodos
+RRHH deberá contar con una opción denominada:
+Administración de periodos
+Desde esta opción podrá:
+Crear un periodo.
+Seleccionar año.
+Seleccionar mes de referencia.
+Generar las fechas automáticamente.
+Visualizar fecha de inicio.
+Visualizar fecha final.
+Activar/desactivar el periodo.
+Consultar periodos existentes.
+Por ejemplo:
+Crear periodo
+Año:
+[ 2026 ▼ ]
+Mes:
+[ NOVIEMBRE ▼ ]
+Fecha inicio:
+22/10/2026
+Fecha fin:
+21/11/2026
+[Crear periodo]
+El sistema deberá calcular automáticamente:
+Fecha inicio = día 22 del mes anterior
+Fecha fin = día 21 del mes seleccionado
+Esto evitará que los usuarios tengan que ingresar manualmente las fechas y cometer errores.
+11. Los días deberán almacenarse en la BD
+Aunque las fechas puedan ser generadas automáticamente utilizando la regla:
+22 del mes anterior → 21 del mes de referencia
+los días que finalmente conforman cada periodo deberán quedar registrados en la base de datos.
+Esto es importante porque el sistema deberá trabajar sobre fechas reales y no recalcularlas permanentemente.
+Por ejemplo:
+Periodo
+ID: 9
+Año: 2026
+Mes: 9
+Nombre: SEPTIEMBRE
+FechaInicio: 22/08/2026
+FechaFin: 21/09/2026
+Estado: ACTIVO
+Y sus días:
+22/08/2026
+23/08/2026
+24/08/2026
+...
+21/09/2026
+Esto permitirá que cada asistencia diaria quede relacionada con una fecha específica.
+12. División del periodo
+Cada periodo tendrá dos quincenas.
+Primera quincena
+22 del mes anterior
+↓
+07 del mes actual
+Ejemplo:
+Periodo septiembre
+22/08 ─────────────── 07/09
+PRIMERA Q.
+Segunda quincena
+08 del mes actual
+↓
+21 del mes actual
+Ejemplo:
+08/09 ─────────────── 21/09
+SEGUNDA Q.
+13. Habilitación del periodo para el responsable
+El responsable deberá contar con un apartado que le permita visualizar y habilitar para registro los periodos disponibles para sus áreas.
+Por ejemplo:
+TAREO
+Área:
+[ OPERACIONES ▼ ]
+Periodo disponible:
+┌───────────────────────────────┐
+│ SEPTIEMBRE 2026               │
+│ 22/08/2026 - 21/09/2026       │
+│                               │
+│ Primera Quincena              │
+│ [ HABILITAR REGISTRO ]        │
+└───────────────────────────────┘
+Al habilitarlo, el sistema deberá cargar los colaboradores correspondientes al área y generar la estructura de fechas para el registro.
+Importante: la habilitación no significa que el responsable pueda modificar las fechas del periodo. Las fechas son definidas por la configuración del periodo administrado por RRHH.
+14. Periodos visibles
+El responsable no deberá visualizar todos los periodos históricos de la base de datos en su registro cotidiano.
+Por ejemplo, aunque existan:
+2026
+2027
+2028
+2029
+2030
+la pantalla de tareo deberá mostrar principalmente los periodos:
+Activos.
+Disponibles para registro.
+Correspondientes al proceso actual.
+Esto evitará confusión.
+15. Notificaciones del tareo
+La plataforma deberá generar recordatorios para el proceso de cada quincena.
+Primera quincena
+Inicio de notificación
+Día 6
+08:00 AM
+Fecha límite
+Día 8
+12:00 PM
+Segunda quincena
+Inicio de notificación
+Día 18
+08:00 AM
+Fecha límite
+Día 22
+12:00 PM
+16. El plazo no impedirá registrar anticipadamente
+El periodo de notificación será una fecha de seguimiento, no necesariamente una restricción absoluta.
+Por ejemplo:
+01/09
+Un responsable podría ingresar y registrar información si el periodo ya fue habilitado.
+El día 6 se enviará el recordatorio correspondiente.
+Por tanto:
+El sistema deberá permitir el registro antes o después de la fecha de notificación, siempre que el periodo continúe habilitado y no haya sido consolidado.
+La fecha límite servirá principalmente para:
+Seguimiento.
+Alertas.
+Identificación de pendientes.
+Control de cumplimiento.
+17. Registro de asistencia
+El registro deberá tener una estructura tipo matriz cruzada:
+COLABORADORES  ×  DÍAS
+Ejemplo:
+FECHA
+22  23  24  25  26  27  28
+Juan Pérez    [A] [A] [A] [F] [A] [A] [A]
+Carlos López  [A] [A] [DS][A] [A] [CM][A]
+Pedro Sánchez [A] [F] [F] [A] [A] [A] [A]
+Cada celda representará el registro de asistencia de un colaborador para una fecha determinada.
+18. Categorías de asistencia
+Se deberá contar con categorías parametrizables.
+CÓDIGO
+DESCRIPCIÓN
+¿CUÁNDO SE UTILIZA?
+A
+Asistencia
+El trabajador cumplió su jornada laboral programada.
+F
+Falta
+El trabajador no asistió a su jornada y no cuenta con una justificación registrada.
+D
+Descanso
+El trabajador tiene descanso programado según su jornada o rol.
+V
+Vacaciones
+Días correspondientes al período vacacional del trabajador.
+DM
+Descanso médico
+El trabajador cuenta con descanso médico debidamente sustentado.
+AM
+Atención médica
+El trabajador se ausenta por una atención o cita médica autorizada.
+LCG
+Licencia con goce de haber
+El trabajador cuenta con una licencia autorizada en la que mantiene el derecho a remuneración.
+LSG
+Licencia sin goce de haber
+El trabajador cuenta con una licencia autorizada sin percepción de remuneración.
+LPP
+Licencia por paternidad
+El trabajador se encuentra dentro del período de licencia por paternidad que le corresponde.
+S
+Suspensión
+El trabajador se encuentra bajo una suspensión laboral registrada.
+SP
+Subsidio
+El período corresponde a una situación cubierta por subsidio, según corresponda.
+CE
+Cesado
+El trabajador ya no mantiene vínculo laboral durante la fecha del registro.
+FT
+Trabajo en feriado
+El trabajador sí laboró durante un día feriado.
+FD
+Descanso por feriado
+El trabajador no labora por corresponderle descanso debido al feriado.
+AV
+Adelanto de vacaciones
+Días de vacaciones otorgados de manera anticipada, antes de completar el período que genera el derecho vacacional.
+19. Detalle diario
+Al seleccionar una celda de asistencia se deberá abrir un formulario.
+Wireframe
+┌──────────────────────────────────────────┐
+│         DETALLE DE ASISTENCIA            │
+├──────────────────────────────────────────┤
+│ Colaborador: Juan Pérez                  │
+│ DNI: 12345678                             │
+│ Fecha: 05/09/2026                         │
+├──────────────────────────────────────────┤
+│ Categoría                                │
+│ [ ASISTENCIA                         ▼ ] │
+│                                          │
+│ Turno                                    │
+│ [ MAÑANA                             ▼ ] │
+│                                          │
+│ Bonificación nocturna                    │
+│ [ ] Corresponde                          │
+│                                          │
+│ Horas extras                             │
+│ [ 5.00 ]                                 │
+│                                          │
+│ Horas extras 25%                         │
+│ [ 3.00 ]                                 │
+│                                          │
+│ Horas extras 30%                         │
+│ [ 2.00 ]                                 │
+│                                          │
+│ Observación                              │
+│ ┌──────────────────────────────────────┐ │
+│ │                                      │ │
+│ └──────────────────────────────────────┘ │
+│                                          │
+│             [ GUARDAR ]                  │
+└──────────────────────────────────────────┘
+20. Turnos
+El sistema deberá permitir registrar el turno correspondiente al día.
+Inicialmente:
+MAÑANA
+TARDE
+NOCHE
+PARTIDO
+La lista deberá ser parametrizable.
+21. Bonificación nocturna
+El registro deberá permitir indicar si corresponde bonificación nocturna.
+☐ Bonificación nocturna
+Esta opción no deberá implicar que todos los trabajadores tienen derecho a dicha bonificación.
+Posteriormente podrá existir una regla de negocio que determine su aplicabilidad según:
+Área.
+Cargo.
+Turno.
+Tipo de trabajador.
+Otras condiciones definidas por la empresa.
+22. Horas extras
+El formulario deberá permitir registrar:
+Horas extras totales
+Horas extras 25%
+Horas extras 30%
+Ejemplo:
+Horas extras totales: 5
+25%: 3
+30%: 2
+El sistema deberá validar que:
+Horas extras 25% + Horas extras 30%
+≤
+Horas extras totales
+También deberá contemplarse posteriormente la posibilidad de registrar si las horas extras fueron autorizadas.
+23. Consideración especial para conductores
+El sistema no deberá asumir automáticamente que toda diferencia entre horas trabajadas y jornada normal constituye horas extras.
+Esto es importante para colaboradores como los conductores que pueden tener modalidades especiales, por ejemplo:
+Horario partido
+4 días de trabajo
+2 días de descanso
+Por tanto, el registro de horas extras deberá considerarse una información específica que deberá ser validada conforme a las reglas laborales de la empresa.
+24. Registro masivo
+La plataforma deberá permitir realizar registros masivos.
+Ejemplo:
+┌────┬────────────────────┬──────────────┐
+│ ☑  │ Juan Pérez         │ PLANILLA     │
+│ ☑  │ Carlos López       │ PLANILLA     │
+│ ☑  │ Pedro Sánchez      │ PRACTICANTE  │
+│ ☐  │ Luis Torres        │ PLANILLA     │
+└────┴────────────────────┴──────────────┘
+Acción:
+Categoría:
+[ ASISTENCIA ▼ ]
+Turno:
+[ MAÑANA ▼ ]
+[ APLICAR ]
+También deberá existir:
+☑ Seleccionar todos
+Esto permitirá que el responsable pueda realizar rápidamente el registro de asistencia habitual y posteriormente modificar solamente las excepciones.
+25. Guardado del tareo
+El responsable podrá guardar el avance aunque todavía no haya terminado.
+Ejemplo:
+25 colaboradores
+Completados: 20
+Pendientes: 5
+Estado:
+EN PROCESO
+Al volver a ingresar posteriormente, deberá visualizar exactamente los datos que ya registró.
+26. Persistencia de la información
+Una vez guardado un registro:
+La información deberá almacenarse en MySQL.
+Por ejemplo:
+Periodo
+↓
+Quincena
+↓
+Colaborador
+↓
+Fecha
+↓
+Asistencia
+↓
+Detalle
+Por ello, cuando el responsable cierre la sesión y vuelva a ingresar, el sistema deberá recuperar los registros existentes.
+27. Notificación del tareo_Quincena
+En la parte superior del módulo Tareo se mostrará una franja horizontal con dos interruptores independientes:
+┌─────────────────────────────────────────────────────────────┐
+│ CULMINACIÓN DEL TAREO                                       │
+│                                                             │
+│ 1RA QUINCENA                    2DA QUINCENA                │
+│ 22/08 – 07/09                   08/09 – 21/09               │
+│                                                             │
+│ Culminar y notificar             Culminar y notificar       │
+│ a RRHH                           a RRHH                     │
+│ [ ○────── ]                      [ ○────── ]                │
+│                                                             │
+│ 💡 Active el interruptor cuando haya terminado el registro │
+│ de la quincena. Se notificará a RRHH automáticamente.       │
+└─────────────────────────────────────────────────────────────┘
+Cada quincena tendrá su propio interruptor.
+El responsable podrá culminarlas de manera independiente.
+Al activarlo, se notificará a RRHH y se registrará la fecha y hora.
+Si existen registros pendientes, el sistema impedirá la culminación.
+28. Estados del tareo
+El proceso tendrá como mínimo:
+PENDIENTE
+↓
+EN PROCESO
+↓
+COMPLETADO
+↓
+ENVIADO
+↓
+CONSOLIDADO
+Si RRHH necesita volver a modificarlo:
+CONSOLIDADO
+↓
+REABIERTO
+↓
+MODIFICADO
+↓
+CONSOLIDADO
+29. Bloqueo posterior a la notiifcación
+Una vez notificado el tareo de una quincena:
+El responsable ya no podrá editarlo.
+Esto evita que el responsable cambie información después de que RRHH haya iniciado el proceso de consolidación.
+Si necesita realizar un cambio:
+Responsable
+↓
+Solicita cambio
+↓
+RRHH
+↓
+Autoriza / realiza modificación
+30. Auditoría
+Toda modificación realizada después del envío deberá quedar registrada.
+Por ejemplo:
+Usuario: Shirley
+Fecha: 01/09/2026 10:31
+Colaborador: Juan Pérez
+Fecha asistencia: 05/09/2026
+Valor anterior: A
+Valor nuevo: CM
+Motivo:
+Constancia médica presentada posteriormente.
+Esto permitirá conocer:
+Quién modificó qué, cuándo y por qué.
+31. Notificar a RRHH
+Dentro del módulo Tareo deberán existir dos botones:
+┌─────────────────────────────┐
+│ [ NOTIFICAR 1RA QUINCENA ]  │
+│ [ NOTIFICAR 2DA QUINCENA ]  │
+└─────────────────────────────┘
+Al seleccionar:
+Notificar 1ra quincena
+se deberá generar un mensaje dirigido a RRHH.
+Ejemplo:
+Asunto:
+Tareo septiembre 2026 – Primera quincena completado
+Mensaje:
+Estimados, se informa que el registro del tareo correspondiente al periodo septiembre 2026 – primera quincena ha sido completado y enviado para su revisión.
+32. Módulo Inicio — Responsable
+Wireframe
+┌─────────────────────────────────────────────────────────────┐
+│ LOGO       GESTIÓN DE TAREO                 👤 Usuario ▼     │
+├──────────────┬──────────────────────────────────────────────┤
+│              │                                              │
+│ 🏠 Inicio    │ Hola, Shirley                               │
+│              │                                              │
+│ 📋 Tareo     │ Tareos                       │
+│              │                                              │
+│ 📊 Detalle   │ ┌────────────┐ ┌────────────┐ ┌───────────┐ │
+│              │ │ PERIODOS   │ │ COMPLETADOS│ │ PENDIENTES│ │
+│ ⚙ Perfil     │ │     2      │ │     1      │ │     1     │ │
+│              │ └────────────┘ └────────────┘ └───────────┘ │
+│              │                                              │
+│              │ SEPTIEMBRE 2026                              │
+│              │                                               │
+│              │ 1ra Q.  ████████████████████ 100% ✓          │
+│              │ 2da Q.  ███████████░░░░░░░░  65% ⚠           │
+│              │                                              │
+└──────────────┴──────────────────────────────────────────────┘
+33. Módulo Tareo — Responsable
+┌─────────────────────────────────────────────────────────────┐
+│ TAREO                                                       │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│ Área                                                       │
+│ [ OPERACIONES ▼ ]                                          │
+│                                                             │
+│ Periodo                                                    │
+│ [ SEPTIEMBRE 2026 ▼ ]                                      │
+│                                                             │
+│ Quincena                                                   │
+│ [ PRIMERA QUINCENA ▼ ]                                     │
+│                                                             │
+│ Estado: EN PROCESO                                         │
+│                                                             │
+│ [ HABILITAR PERIODO ]   [ NOTIFICAR A RRHH ]               │
+│                                                             │
+├─────────────────────────────────────────────────────────────┤
+│ Tipo de trabajador                                         │
+│                                                             │
+│ ☑ PLANILLA       ☐ PRACTICANTE       ☐ HONORARIOS          │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+34. Matriz de tareo
+┌────┬──────────────────────┬──────────────┬──────────┬────────┬────────┬─────┐
+│ ☑  │ COLABORADOR          │ DNI          │ TIPO     │ 22 AGO │ 23 AGO │ ... │
+├────┼──────────────────────┼──────────────┼──────────┼────────┼────────┼─────┤
+│ ☑  │ Juan Pérez           │ 12345678     │ Planilla │   A    │   A    │ ... │
+│ ☐  │ Carlos López         │ 45678912     │ Practic. │   A    │  CM    │ ... │
+└────┴──────────────────────┴──────────────┴──────────┴────────┴────────┴─────┘
+La pantalla de registro deberá presentar el tareo en formato de matriz, donde cada fila corresponda a un colaborador y cada columna represente un día del periodo seleccionado.
+Los datos del colaborador permanecerán agrupados en las primeras columnas y quedarán fijos al desplazarse horizontalmente, mientras que las fechas se mostrarán a continuación.
+Datos del colaborador: selección, nombre, DNI, tipo de trabajador, área y subárea.
+Cada celda correspondiente a un día será interactiva y permitirá registrar o consultar el estado de asistencia y su detalle.
+La matriz deberá permitir desplazamiento horizontal, manteniendo visibles los datos principales del colaborador para facilitar el registro cuando el periodo contenga varios días.
+35. Detalle de Tareo
+El menú tendrá:
+Detalle de Tareo
+con filtros:
+Año
+[2026 ▼]
+Periodo
+[Septiembre ▼]
+Fecha inicio
+[22/08/2026]
+Fecha fin
+[21/09/2026]
+Tipo trabajador
+[☑ Planilla
+☑ Practicante]
+Área
+[☑ Operaciones]
+Subárea
+[☑ Conductores]
+Colaborador
+[ Buscar colaborador... ]
+Botones:
+[ BUSCAR ] [ LIMPIAR ]
+36. Resultado del detalle
+El resultado se mostrará en un formato tabular similar a Excel, facilitando la revisión y comparación de la información.
+Cada registro corresponderá a un colaborador por fecha, por lo que el nombre de un colaborador podrá aparecer varias veces, una por cada día registrado del periodo.
+┌──────────────┬────────────────┬────────────┬──────────┬────────┬────────┬──────────────┐
+│ COLABORADOR  │ DNI            │ TIPO       │ ÁREA     │ FECHA  │ ASIST. │ TURNO        │
+├──────────────┼────────────────┼────────────┼──────────┼────────┼────────┼──────────────┤
+│ JUAN PÉREZ   │ 12345678       │ PLANILLA   │ OPERAC.  │ 22/08  │ A      │ M            │
+│ JUAN PÉREZ   │ 12345678       │ PLANILLA   │ OPERAC.  │ 23/08  │ A      │ M            │
+│ JUAN PÉREZ   │ 12345678       │ PLANILLA   │ OPERAC.  │ 24/08  │ DS     │ -            │
+│ JUAN PÉREZ   │ 12345678       │ PLANILLA   │ OPERAC.  │ 25/08  │ A      │ N            │
+│ CARLOS LÓPEZ │ 45678912       │ PRACTIC.   │ OPERAC.  │ 22/08  │ A      │ M            │
+│ CARLOS LÓPEZ │ 45678912       │ PRACTIC.   │ OPERAC.  │ 23/08  │ CM     │ -            │
+│ ...          │ ...            │ ...        │ ...      │ ...    │ ...    │ ...          │
+└──────────────┴────────────────┴────────────┴──────────┴────────┴────────┴──────────────┘
+También deberá mostrar las columnas correspondientes a:
+Horas extras totales.
+Horas extras 25%.
+Horas extras 30%.
+Bonificación nocturna.
+Observaciones.
+La información podrá ordenarse del registro más reciente al más antiguo y deberá respetar los filtros seleccionados previamente.
+Por ejemplo, si se consulta septiembre de 2026, Juan Pérez aparecerá aproximadamente 31 veces, una por cada día del periodo, dependiendo de los días considerados para su registro. Esto permitirá visualizar el detalle completo del tareo en un formato similar a una hoja de Excel.
+37. Exportación
+Los resultados filtrados deberán poder exportarse:
+[ 📊 EXCEL ]
+[ 📄 PDF ]
+[ TXT ]
+El archivo deberá contener únicamente la información correspondiente a los filtros seleccionados.
+38. Dashboard de RRHH
+RRHH tendrá una visión general.
+Wireframe
+┌──────────────────────────────────────────────────────────────┐
+│ DASHBOARD RRHH                                               │
+├──────────────────────────────────────────────────────────────┤
+│ Periodo: [ SEPTIEMBRE 2026 ▼ ]                               │
+│                                                              │
+│ ┌────────────┐ ┌────────────┐ ┌────────────┐ ┌────────────┐ │
+│ │ ÁREAS      │ │ COMPLETAS  │ │ PENDIENTES │ │ AVANCE     │ │
+│ │    14      │ │     9      │ │     5      │ │    64%     │ │
+│ └────────────┘ └────────────┘ └────────────┘ └────────────┘ │
+│                                                              │
+│ ESTADO DEL TAREO                                             │
+│                                                              │
+│ Operaciones          ████████████████████ 100% ✓             │
+│ Sistemas             ████████████████████ 100% ✓             │
+│ Recaudo              █████████████░░░░░░  70% ⚠             │
+│ Contabilidad          ████████████████████ 100% ✓             │
+│ Seguridad             ██████░░░░░░░░░░░░░  35% 🔴            │
+│                                                              │
+└──────────────────────────────────────────────────────────────┘
+39. Seguimiento de RRHH
+RRHH tendrá una vista tabular que permitirá visualizar el estado del tareo de cada área y subárea, incluyendo el estado de ambas quincenas y la fecha de culminación/notificación.
+┌──────────────────────┬────────────────────────┬────────┬───────────────┬────────┬───────────────┐
+│ ÁREA                 │ SUBÁREA                │ 1RA Q. │ FECHA ENVÍO   │ 2DA Q. │ FECHA ENVÍO   │
+├──────────────────────┼────────────────────────┼────────┼───────────────┼────────┼───────────────┤
+│ OPERACIONES          │ CENTRO DE CONTROL      │   ✓    │ 08/09 10:20   │   ✓    │ 22/09 09:10   │
+│ OPERACIONES          │ CONDUCTORES PATIO      │   ✓    │ 08/09 11:15   │   ⚠    │ —             │
+│ OPERACIONES          │ GERENCIA OPERACIONES   │   ✓    │ 08/09 10:30   │   ⚠    │ —             │
+│ OPERACIONES          │ DESPACHO E INSPECTORIA │   ✗    │ —             │   ⚠    │ —             │
+│ LIQUIDACIÓN           │ RECAUDO                │   ✓    │ 08/09 09:45   │   ✓    │ 22/09 11:30   │
+│ LIQUIDACIÓN           │ ZONA PAGA LEONCIO      │   ✓    │ 08/09 10:10   │   ⚠    │ —             │
+│ LIQUIDACIÓN           │ ZONA PAGA BOLIVIA      │   ✗    │ —             │   ⚠    │ —             │
+│ SISTEMAS             │ —                      │   ✓    │ 08/09 09:30   │   ✓    │ 22/09 10:15   │
+│ DATOS                │ —                      │   ✓    │ 08/09 09:50   │   ⚠    │ —             │
+└──────────────────────┴────────────────────────┴────────┴───────────────┴────────┴───────────────┘
+Esto permitirá saber en tiempo real:
+Quién terminó.
+Quién no terminó.
+Cuándo envió.
+Qué quincena está pendiente.
+Qué áreas requieren seguimiento.
+Estados:
+✓ Culminado: el responsable activó el interruptor y notificó a RRHH.
+⚠ Pendiente: aún no se ha culminado la quincena.
+40. Vista de RRHH — Tareo
+RRHH deberá poder seleccionar:
+Áreas:
+☑ OPERACIONES
+☑ LIQUIDACIÓN
+☐ SISTEMAS
+☐ DATOS
+☐ LEGAL
+☑ RRHH
+Y el sistema deberá mostrar toda la información correspondiente a esas áreas.
+También deberá poder seleccionar subáreas:
+OPERACIONES
+☑ CENTRO_CONTROL
+☑ CONDUCTORES_PATIO
+LIQUIDACIÓN
+☑ RECAUDO
+☐ ZONA_PAGA_LEONCIO
+41. Caso de Shirley
+Por ejemplo, Shirley podría tener:
+ROL: RRHH
+ÁREAS ASIGNADAS:
+✓ RRHH
+✓ RECAUDO
+REGISTRO ESPECIAL:
+✓ JEFATURAS
+Por lo tanto, su vista podría mostrar:
+TAREO
+Área
+┌───────────────────────────┐
+│ RRHH                   ▼  │
+└───────────────────────────┘
+Opciones disponibles:
+✓ RRHH
+✓ RECAUDO
+✓ JEFATURAS
+De esta manera puede realizar el tareo de:
+RRHH.
+Recaudo.
+Jefaturas.
+Pero no tendrá acceso operativo a áreas que no tenga asignadas.
+42. Registro de jefaturas
+RRHH deberá contar con una vista exclusiva para el registro de asistencia de las jefaturas, debido a que su control de asistencia requiere un tratamiento diferenciado respecto al personal operativo y administrativo. Por ejemplo, una jefatura puede tener un horario o modalidad de trabajo diferente y no necesariamente ser registrada por el responsable de su área. Por ello, RRHH gestionará directamente su tareo, identificando el área a la que pertenece, Nombre(apellidos y nombre del jefe) y la asistencia correspondiente a cada día del periodo.
+TAREO DE JEFATURAS
+Periodo:   [ SEPTIEMBRE 2026 ▼ ]       Quincena: [ PRIMERA ▼ ]
+ÁREA
+Apellidos y Nombres
+22
+23
+24
+25
+Gerencia General
+Pérez García Juan
+A
+A
+A
+A
+Sistemas
+López Torres María
+A
+A
+DS
+A
+Operaciones
+Ramírez Flores Claros
+A
+A
+A
+A
+Si bien las jefaturas se gestionarán de forma independiente durante el registro y validación, al momento de realizar la consolidación del tareo, sus registros deberán integrarse automáticamente con el área a la que pertenece cada jefatura. Por ejemplo, el tareo de la Jefatura de Sistemas será registrado por RRHH en la sección de jefaturas, pero al consolidar el periodo, sus registros formarán parte del área Sistemas junto con los demás colaboradores de dicha área.
+Esto permite mantener un control diferenciado de las jefaturas sin perder su correspondencia con la estructura organizacional.
+43. Estructura del menú del Responsable
+┌────────────────────────┐
+│ MENÚ                   │
+├────────────────────────┤
+│ 🏠 Inicio              │
+│                        │
+│ 📋 Tareo               │
+│                        │
+│ 📊 Detalle de Tareo    │
+│                        │
+│                        │
+│ 👤 Mi perfil           │
+│                        │
+│ 🚪 Cerrar sesión       │
+└────────────────────────┘
+44. Estructura del menú de RRHH
+┌──────────────────────────────┐
+│ RRHH                         │
+├──────────────────────────────┤
+│ 🏠 Inicio                    │
+│                              │
+│ 👥 Colaboradores             │
+│                              │
+│ 🏢 Áreas y Subáreas          │
+│                              │
+│ 👤 Usuarios                  │
+│                              │
+│ 🔐 Roles y Permisos          │
+│                              │
+│ 📅 Periodos                  │
+│                              │
+│ 📋 Tareo                     │
+│                              ││                              │
+│ 📊 Seguimiento               │
+│                              │
+│ 📈 Reportes                  │
+└──────────────────────────────┘
+Funciones:
+Inicio: muestra un resumen general del estado del tareo.
+Colaboradores: permite registrar y actualizar la información de los colaboradores.
+Áreas y Subáreas: permite administrar la estructura organizacional.
+Usuarios: permite crear, activar, desactivar y administrar las cuentas del sistema.
+Roles y Permisos: permite asignar los permisos correspondientes a cada usuario.
+Periodos: permite crear y administrar los periodos de tareo y definir cuáles se encuentran activos para el registro.
+Tareo: permite a RRHH consultar los registros de tareo que le corresponden gestionar. (Jefatura)
+Seguimiento: permite verificar el avance y culminación del tareo por área y subárea para cada quincena.
+Reportes: permite consultar el tareo global, aplicar filtros por periodo, fechas, área, subárea, tipo de trabajador y colaborador, además de crear, modificar y consultar registros, siempre que el periodo se encuentre activo. También permite exportar la información a Excel, PDF o TXT.
+Regla principal: cuando el periodo se encuentre activo, RRHH podrá gestionar los registros. Una vez cerrado o consolidado, los registros quedarán protegidos contra modificaciones, salvo que posteriormente se implemente un mecanismo de reapertura autorizado.
+45. Requerimiento fundamental de permisos
+El sistema deberá aplicar control de acceso por rol y por área.
+No será suficiente con ocultar información en el frontend.
+Por ejemplo:
+Usuario
+↓
+Rol
+↓
+Áreas autorizadas
+↓
+Subáreas autorizadas
+↓
+Colaboradores visibles
+↓
+Tareo permitido
+Si un responsable solamente tiene:
+OPERACIONES
+no podrá acceder mediante una URL o petición API a:
+RRHH
+SISTEMAS
+CONTABILIDAD
+46. Regla de seguridad importante
+Si el usuario intenta seleccionar manualmente un área que no tiene autorizada:
+OPERACIONES
+RRHH
+SISTEMAS
+y selecciona:
+RRHH
+el backend deberá responder:
+No tienes permisos para acceder al área seleccionada.
+Esto deberá validarse en Spring Boot.
+47. Modelo conceptual final
+La lógica general del sistema quedaría:
+USUARIO
+│
+┌──────┴──────┐
+│             │
+ROL         ÁREA ASIGNADA
+│             │
+│             ▼
+│          SUBÁREA
+│             │
+│             ▼
+│       COLABORADORES
+│             │
+└──────┬──────┘
+│
+▼
+TAREO
+│
+┌───────────┴───────────┐
+│                       │
+PERIODO                 QUINCENA
+│                       │
+│               ┌───────┴───────┐
+│               │               │
+│              1RA             2DA
+│               │               │
+└───────────────┴───────┬───────┘
+│
+▼
+DÍAS DEL PERIODO
+│
+▼
+ASISTENCIA DIARIA
+│
+┌────────────┼────────────┐
+▼            ▼            ▼
+Categoría      Turno       Detalle
+│
+┌────────────┼───────────┐
+▼            ▼           ▼
+Bonificación   HE 25%      HE 30%
+│
+▼
+Observaciones
+48. Flujo completo del negocio
+El proceso que deberá soportar la plataforma será:
+RRHH
+│
+▼
+CREA / ADMINISTRA
+EL PERIODO
+│
+▼
+22 → 21 DEL SIGUIENTE
+│
+▼
+SE GENERAN DÍAS
+│
+▼
+SE IDENTIFICAN COLABORADORES
+ACTIVOS
+│
+▼
+RESPONSABLE HABILITA
+EL PERIODO
+│
+▼
+SELECCIONA QUINCENA
+│
+┌──────────┴──────────┐
+▼                     ▼
+1RA Q.                 2DA Q.
+22 → 07                 08 → 21
+│                     │
+▼                     ▼
+REGISTRA               REGISTRA
+ASISTENCIAS             ASISTENCIAS
+│                     │
+▼                     ▼
+GUARDA AVANCE          GUARDA AVANCE
+│                     │
+▼                     ▼
+¿COMPLETO?             ¿COMPLETO?
+│                     │
+NO                    NO
+│                     │
+CONTINÚA              CONTINÚA
+│
+SÍ
+│
+▼
+ENVÍA A RRHH
+│
+▼
+BLOQUEO PARA
+RESPONSABLE
+│
+▼
+RRHH REVISA
+│
+▼
+CONSOLIDA
+│
+▼
+REPORTES
+│
+▼
+EXCEL/PDF/TXT
+49. Requerimientos no funcionales
+La plataforma deberá cumplir también con:
+Seguridad
+Autenticación.
+Autorización por roles.
+Autorización por áreas.
+Contraseñas almacenadas de forma segura.
+Validación de permisos en backend.
+Integridad
+No permitir tareos incompletos.
+No permitir duplicidad de registros.
+No permitir modificaciones no autorizadas.
+Mantener consistencia entre periodo, quincena, colaborador y fecha.
+Trazabilidad
+Toda modificación relevante deberá registrar:
+Usuario
+Fecha/hora
+Acción
+Registro afectado
+Valor anterior
+Valor nuevo
+Motivo
+Escalabilidad
+La plataforma deberá permitir incorporar:
+Nuevas áreas.
+Nuevas subáreas.
+Nuevos tipos de trabajador.
+Nuevos tipos de asistencia.
+Nuevos turnos.
+Nuevos responsables.
+Nuevas reglas de negocio.
+Nuevos periodos.
+sin necesidad de modificar la estructura principal del sistema.
+50. Resultado esperado
+Al finalizar el proyecto, la empresa deberá contar con una plataforma que permita reemplazar el proceso disperso de archivos y seguimiento manual por un flujo centralizado:
+Administrar → Habilitar → Registrar → Validar → Enviar → Consolidar → Auditar → Reportar
+Y, sobre todo, el sistema deberá responder en cualquier momento a preguntas como:
+¿Qué áreas ya completaron su tareo?
+¿Qué responsables todavía no enviaron?
+¿Qué colaboradores tienen registros pendientes?
+¿Qué periodo y quincena se está trabajando?
+¿Qué asistencia registró cada colaborador?
+¿Quién realizó una modificación?
+¿Cuándo se envió el tareo?
+¿Qué áreas tiene autorizadas cada responsable?
+¿Qué colaboradores estaban activos y fueron considerados para ese periodo?
+Decisión de diseño clave: generación del periodo a partir de la configuración
+La generación de un periodo no deberá tener las fechas codificadas directamente en el sistema. Al crear un nuevo periodo, el sistema deberá tomar las reglas definidas en la configuración del tareo y utilizar la fecha actual como referencia para determinar el periodo correspondiente y sus fechas.
+Por ejemplo, si RRHH selecciona o crea el periodo noviembre 2026, el sistema aplicará la configuración establecida para el ciclo de tareo:
+Inicio del periodo: día 22 del mes anterior.
+Fin del periodo: día 21 del mes seleccionado.
+1.ª quincena: día 22 del mes anterior → día 7 del mes seleccionado.
+2.ª quincena: día 8 → día 21 del mes seleccionado.
+Por lo tanto:
+PERIODO NOVIEMBRE 2026
+Inicio: 22/10/2026
+Fin: 21/11/2026
+1.ª quincena: 22/10/2026 → 07/11/2026
+2.ª quincena: 08/11/2026 → 21/11/2026
+El sistema deberá generar automáticamente los días comprendidos dentro del periodo y almacenarlos en la base de datos. Estos días serán posteriormente utilizados para relacionar los registros de asistencia.
+La fecha actual servirá como referencia para determinar qué periodo corresponde generar o activar, mientras que las fechas ya generadas quedarán almacenadas en la BD. De esta forma, si posteriormente se modifica la configuración, no se alterarán los periodos históricos ya creados.
+Regla: la configuración define cómo se genera el periodo; la fecha actual sirve como referencia para la generación; y el periodo almacenado en la BD se convierte en la fuente oficial de fechas para el tareo.

@@ -1,0 +1,14 @@
+<div class="layout flex h-screen overflow-hidden bg-[#f0f5fb] dark:bg-[#0a1628]">
+  @if (authService.isRrhh()) {
+    <app-rrhh-sidebar />
+  } @else if (authService.isResponsable()) {
+    <app-responsable-sidebar />
+  }
+
+  <div class="flex flex-col flex-1 min-w-0">
+    <app-header />
+    <main class="flex-1 overflow-auto p-6 animate-fade-in">
+      <router-outlet />
+    </main>
+  </div>
+</div>

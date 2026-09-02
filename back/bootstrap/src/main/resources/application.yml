@@ -1,0 +1,41 @@
+spring:
+  application:
+    name: tareo
+  profiles:
+    active: dev
+  threads:
+    virtual:
+      enabled: true
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        default_schema: app
+  flyway:
+    enabled: true
+    schemas: app
+    default-schema: app
+    locations: classpath:db/migration
+
+server:
+  port: 8080
+
+app:
+  jwt:
+    secret: ${JWT_SECRET:fatima-tareo-dev-secret-key-min-32-chars!!}
+    expiration-ms: 86400000
+  cors:
+    allowed-origins:
+      - http://localhost:4200
+  recordatorio:
+    cron: "0 0 8 * * MON"
+  notificaciones:
+    rrhh-email: ${RRHH_EMAIL:rrhh@ctarequipa.pe}
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html

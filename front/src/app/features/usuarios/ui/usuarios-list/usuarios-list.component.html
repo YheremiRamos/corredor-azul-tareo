@@ -1,0 +1,13 @@
+<div class="space-y-6">
+  <h1 class="text-2xl font-semibold text-slate-800 dark:text-slate-100">Usuarios</h1>
+  <p-card class="rounded-xl shadow-sm border">
+    <p-table [value]="usuariosResource.value() ?? []" [loading]="usuariosResource.isLoading()">
+      <ng-template #header>
+        <tr><th>Email</th><th>Rol</th></tr>
+      </ng-template>
+      <ng-template #body let-usuario>
+        <tr><td>{{ usuario.email }}</td><td>{{ usuario.rol }}</td></tr>
+      </ng-template>
+    </p-table>
+  </p-card>
+</div>

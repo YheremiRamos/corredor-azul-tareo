@@ -1,0 +1,189 @@
+<div class="page-enter flex flex-col gap-6">
+  <div class="page-header">
+    <h1 class="page-title">Tareo de asistencia</h1>
+    <p class="page-subtitle">Registro diario por área y quincena del ciclo 22 → 21</p>
+  </div>
+
+  <div class="toolbar-card">
+    <p class="field-label mb-4">Configuración del tareo</p>
+    <div class="flex flex-wrap gap-4 items-end">
+      <div class="flex flex-col gap-1.5 flex-1 min-w-[140px]">
+        <label class="field-label">Período</label>
+        <p-select
+          [options]="periodosResource.value() ?? []"
+          optionLabel="nombre"
+          optionValue="id"
+          [ngModel]="periodoId()"
+          (ngModelChange)="periodoId.set($event ?? null)"
+          placeholder="Seleccionar período"
+          class="w-full"
+        />
+      </div>
+      <div class="flex flex-col gap-1.5 flex-1 min-w-[140px]">
+        <label class="field-label">Área</label>
+        <p-select
+          [options]="areasResource.value() ?? []"
+          optionLabel="nombre"
+          optionValue="id"
+          [ngModel]="areaId()"
+          (ngModelChange)="areaId.set($event)"
+          placeholder="Seleccionar área"
+          class="w-full"
+        />
+      </div>
+      <div class="flex flex-col gap-1.5 min-w-[140px]">
+        <label class="field-label">Quincena</label>
+        <p-select
+          [options]="[
+            { label: '1ra — días 22 al 07', value: 1 },
+            { label: '2da — días 08 al 21', value: 2 },
+          ]"
+          optionLabel="label"
+          optionValue="value"
+          [ngModel]="quincena()"
+          (ngModelChange)="quincena.set($event)"
+          class="w-full"
+        />
+      </div>
+      <p-button label="Habilitar tareo" icon="pi pi-play" (onClick)="habilitarTareo()" />
+    </div>
+  </div>
+
+  @if (matrizResource.isLoading()) {
+    <div class="content-card p-12 flex flex-col items-center gap-3">
+      <i class="pi pi-spin pi-spinner text-2xl text-corredor-500"></i>
+      <p class="text-sm text-slate-500 font-medium">Cargando matriz de asistencia...</p>
+    </div>
+  } @else if (matrizResource.value(); as matriz) {
+    <div class="content-card matrix-card">
+      <div class="matrix-toolbar">
+        <div class="flex items-center gap-3">
+          <span
+            class="status-pill"
+            [class.status-pill--editable]="!matriz.bloqueada"
+            [class.status-pill--locked]="matriz.bloqueada"
+          >
+            <i class="pi" [class.pi-lock-open]="!matriz.bloqueada" [class.pi-lock]="matriz.bloqueada"></i>
+            {{ matriz.bloqueada ? 'Quincena enviada' : 'Editable' }}
+          </span>
+          <span class="text-sm text-slate-500 font-medium">
+            {{ matriz.filas.length }} colaborador{{ matriz.filas.length !== 1 ? 'es' : '' }}
+          </span>
+        </div>
+        @if (!matriz.bloqueada) {
+          <p-button
+            label="Culminar quincena"
+            icon="pi pi-check"
+            severity="success"
+            (onClick)="culminar()"
+          />
+        }
+      </div>
+
+      <div class="matrix-scroll">
+        <p-table [value]="matriz.filas" [scrollable]="true" scrollHeight="520px" styleClass="matrix-table">
+          <ng-template #header>
+            <tr>
+              <th pFrozenColumn class="matrix-frozen-col">Colaborador</th>
+              <th pFrozenColumn class="matrix-frozen-col matrix-dni-col">DNI</th>
+              @for (dia of matriz.dias; track dia.id) {
+                <th class="matrix-day-col">
+                  <span class="matrix-day-name">{{ dia.diaSemana }}</span>
+                  <span class="matrix-day-num">{{ dia.fecha | date: 'dd' }}</span>
+                </th>
+              }
+            </tr>
+          </ng-template>
+          <ng-template #body let-fila>
+            <tr>
+              <td pFrozenColumn class="matrix-frozen-col font-semibold text-sm">{{ fila.nombres }}</td>
+              <td pFrozenColumn class="matrix-frozen-col matrix-dni-col text-slate-500 text-sm">{{ fila.dni }}</td>
+              @for (asist of fila.asistencias; track asist.periodoDiaId) {
+                @let dia = matriz.dias.find((d) => d.id === asist.periodoDiaId);
+                <td class="matrix-cell">
+                  <button
+                    type="button"
+                    class="attendance-chip"
+                    [class]="chipClass(asist.categoriaCodigo)"
+                    [disabled]="matriz.bloqueada"
+                    (click)="abrirDetalle(fila, asist, dia?.fecha ?? '')"
+                  >
+                    {{ asist.categoriaCodigo ?? '·' }}
+                  </button>
+                </td>
+              }
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+  } @else {
+    <div class="content-card p-12 text-center">
+      <div class="w-14 h-14 rounded-2xl bg-corredor-100 dark:bg-corredor-800/40 text-corredor-600 flex items-center justify-center mx-auto mb-4 text-2xl">
+        <i class="pi pi-table"></i>
+      </div>
+      <p class="font-semibold text-slate-700 dark:text-slate-200">Sin matriz cargada</p>
+      <p class="text-sm text-slate-500 mt-1">Seleccione período y área, luego habilite el tareo.</p>
+    </div>
+  }
+</div>
+
+<p-dialog
+  header="Detalle de asistencia"
+  [visible]="detalleVisible()"
+  (visibleChange)="detalleVisible.set($event)"
+  [modal]="true"
+  [style]="{ width: '480px' }"
+  [draggable]="false"
+>
+  <div class="flex flex-col gap-4">
+    <div class="flex flex-col gap-1.5">
+      <label class="field-label">Categoría</label>
+      <p-select
+        [options]="categorias"
+        optionLabel="label"
+        optionValue="value"
+        [ngModel]="editCategoria()"
+        (ngModelChange)="editCategoria.set($event)"
+        class="w-full"
+      />
+    </div>
+    <div class="flex flex-col gap-1.5">
+      <label class="field-label">Turno</label>
+      <p-select
+        [options]="turnos"
+        optionLabel="label"
+        optionValue="value"
+        [ngModel]="editTurno()"
+        (ngModelChange)="editTurno.set($event)"
+        class="w-full"
+      />
+    </div>
+    <div class="flex items-center gap-2 py-1">
+      <p-toggleswitch [ngModel]="editBn()" (ngModelChange)="editBn.set($event)" />
+      <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Bonificación nocturna</span>
+    </div>
+    <div class="grid grid-cols-3 gap-3">
+      <div class="flex flex-col gap-1.5">
+        <label class="field-label">HE Total</label>
+        <p-inputnumber [ngModel]="editHeTotal()" (ngModelChange)="editHeTotal.set($event)" />
+      </div>
+      <div class="flex flex-col gap-1.5">
+        <label class="field-label">HE 25%</label>
+        <p-inputnumber [ngModel]="editHe25()" (ngModelChange)="editHe25.set($event)" />
+      </div>
+      <div class="flex flex-col gap-1.5">
+        <label class="field-label">HE 30%</label>
+        <p-inputnumber [ngModel]="editHe30()" (ngModelChange)="editHe30.set($event)" />
+      </div>
+    </div>
+    <div class="flex flex-col gap-1.5">
+      <label class="field-label">Observación</label>
+      <textarea pTextarea rows="3" class="w-full" [ngModel]="editObs()" (ngModelChange)="editObs.set($event)"></textarea>
+    </div>
+    <div class="flex justify-end gap-2 pt-2">
+      <p-button label="Cancelar" severity="secondary" [outlined]="true" (onClick)="detalleVisible.set(false)" />
+      <p-button label="Guardar" icon="pi pi-check" (onClick)="guardarDetalle()" />
+    </div>
+  </div>
+</p-dialog>
